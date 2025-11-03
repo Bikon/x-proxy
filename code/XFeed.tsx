@@ -75,13 +75,13 @@ function Media({ m }: { m: any }) {
         <div style={{ position: "relative", width: "100%", overflow: "hidden", borderRadius: 12 }}>
             {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <img src={src} style={{ width: "100%", height: "100%", objectFit: "cover" }} loading="lazy" />
-            {isVideo ? (
+            {isVideo && (
                 <div style={{
                     position: "absolute", right: 8, bottom: 8,
                     background: "rgba(0,0,0,0.6)", color: "#fff",
                     borderRadius: 999, padding: "4px 8px", fontSize: 12,
                 }}>▶︎</div>
-            ) : null}
+            )}
         </div>
     );
 }
@@ -137,6 +137,7 @@ export default function XFeed(props: any) {
         showRetweets = true,
         showQuotes = false,
         // licensing
+        showMedia = true,
         licenseKey = "",
         proPurchaseUrl = "",
     } = props;
@@ -216,8 +217,19 @@ export default function XFeed(props: any) {
     const effectiveShown = isPro ? tweets.length : Math.min(tweets.length, 5);
 
     return (
-        <div style={{ display: "grid", gap: 12, color: colors.text }}>
-            {showUserInfo && user ? (
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 12,
+            color: colors.text,
+            height: "100%",
+            overflowY: "auto",
+            overflowX: "hidden",
+            paddingRight: 6,
+            scrollbarWidth: "thin",
+            scrollbarColor: theme === "dark" ? "#555 #222" : "#bbb #f9f9f9",
+        }}>
+            {showUserInfo && user && (
                 <div style={{
                     display: "flex", alignItems: "center", gap: 12, padding: 10,
                     borderRadius: 12, border: `1px solid ${colors.line}`, background: colors.cardBg,
@@ -229,19 +241,19 @@ export default function XFeed(props: any) {
                         <div style={{ opacity: 0.75, fontSize: 12 }}>@{user.username}</div>
                     </div>
                 </div>
-            ) : null}
+            )}
 
             {!isPro && displayCount > 5 && (
                 <Banner theme={theme}>
                     You are using the free version — <b>maximum 5 posts</b>.<br />
                     Enter your <i>License Key</i> in the component properties to unlock more.
-                    {proPurchaseUrl ? (
+                    {proPurchaseUrl && (
                         <div style={{ marginTop: 8 }}>
                             <a href={proPurchaseUrl} target="_blank" rel="noreferrer" style={{ color: colors.link, textDecoration: "underline" }}>
                                 Get Pro
                             </a>
                         </div>
-                    ) : null}
+                    )}
                     <div style={{ fontSize: 12, opacity: .7, marginTop: 6 }}>
                         Requested: {displayCount}, displaying: 5
                     </div>
@@ -265,11 +277,11 @@ export default function XFeed(props: any) {
                             <Linkified text={t.text} theme={theme} />
                         </div>
 
-                        {t.media?.length ? (
+                        {showMedia && t.media?.length && (
                             <div style={{ display: "grid", gap: 8 }}>
                                 {t.media.slice(0, 4).map((m: any) => <Media key={m.media_key} m={m} />)}
                             </div>
-                        ) : null}
+                        )}
 
                         {( (showLikes || showReplies || showRetweets || showQuotes) && t.public_metrics ) && (
                             <div style={{ display: "flex", gap: 16, alignItems: "center", fontSize: 12, opacity: 0.85 }}>
@@ -306,6 +318,7 @@ addPropertyControls(XFeed, {
     showReplies:  { type: ControlType.Boolean, title: "Replies", defaultValue: true },
     showRetweets: { type: ControlType.Boolean, title: "Retweets", defaultValue: true },
     showQuotes:   { type: ControlType.Boolean, title: "Quotes", defaultValue: false },
+    showMedia:    { type: ControlType.Boolean, title: "Media", defaultValue: true },
     licenseKey:   { type: ControlType.String, title: "License Key", placeholder: "PRO-XXXXXXXX" },
     proPurchaseUrl:{ type: ControlType.String, title: "Buy Pro URL", placeholder: "https://…" },
 });
@@ -320,6 +333,7 @@ addPropertyControls(XFeed, {
     showReplies: true,
     showRetweets: true,
     showQuotes: false,
+    showMedia: true,
     licenseKey: "",
     proPurchaseUrl: "",
 };
